@@ -3,9 +3,9 @@
 <!--    配置连接池mysql-->
     <named-config name="mysql">
         <property name="driverClass">com.mysql.jdbc.Driver</property>
-        <property name="jdbcUrl">jdbc:mysql://139.196.194.38:3306/chat</property>
+        <property name="jdbcUrl">jdbc:mysql://43.138.49.210:3315/chat</property>
         <property name="user">root</property>
-        <property name="password">WYLdh0513-</property>
+        <property name="password">wyl123456</property>
 <!--        初始化连接数-->
         <property name="initialPoolSize">10</property>
 <!--        最大空闲时间，多少秒内未使用则连接被丢弃，若为0则永不丢弃，Default:0-->

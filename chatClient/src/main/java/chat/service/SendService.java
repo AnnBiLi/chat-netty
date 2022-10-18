@@ -196,6 +196,7 @@ public class SendService {
         }else {
             //登录失败
             System.out.println("登录失败");
+            loginView();
         }
 
     }
@@ -258,7 +259,7 @@ public class SendService {
 
             }else {
                 //System.out.println("一对一聊天");
-                singleChat(split[0],split[1]);
+                singleChat(split[1],split[2]);
 
             }
 
@@ -298,7 +299,8 @@ public class SendService {
         }
 
         if (code == 200){
-            System.out.println("已下线");
+            System.out.println("已下线code");
+            channel.close();
         }else {
             System.out.println("操作失败");
             showMainMenu();
@@ -335,6 +337,7 @@ public class SendService {
 
         if (code == 200){
             System.out.println("修改成功");
+            showMainMenu();
         }else {
             System.out.println("修改失败");
             showMainMenu();

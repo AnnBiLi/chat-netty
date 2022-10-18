@@ -60,6 +60,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
                 int code = objectNode.get("code").asInt();
                 queue.offer(code);
 
+            }else if (EnMsgType.EN_MSG_OFFLINE.toString().equals(srctype)) {
+                //发送端的返回消息
+                int code = objectNode.get("code").asInt();
+                queue.offer(code);
+
             }
         }else if (EnMsgType.EN_MSG_CHAT.toString().equals(msgtype)){
             //接收端接收消息
@@ -69,5 +74,10 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
             System.out.println(fromname+"发送消息:"+msg1);
         }
 
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("已下线");
     }
 }
