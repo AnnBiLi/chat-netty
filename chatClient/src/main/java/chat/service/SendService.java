@@ -292,7 +292,7 @@ public class SendService {
         //等待服务端返回消息
         int code = 0;
         try {
-            ClientHandler.queue.take();
+            code = ClientHandler.queue.take();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -328,7 +328,7 @@ public class SendService {
         //等服务端的返回消息
         int code = 0;
         try {
-            ClientHandler.queue.take();
+            code = ClientHandler.queue.take();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -10,11 +10,11 @@ public class User {
     private String email;
     private int user_state_id;
 
-    public int getUser_state_id() {
+    public int getUserStateId() {
         return user_state_id;
     }
 
-    public void setUser_state_id(int user_state_id) {
+    public void setUserStateId(int user_state_id) {
         this.user_state_id = user_state_id;
     }
 

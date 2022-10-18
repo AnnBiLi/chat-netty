@@ -55,6 +55,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
 //                }else {
 //                    System.out.println("消息发送成功");
 //                }
+            }else if (EnMsgType.EN_MSG_MODIFY_PWD.toString().equals(srctype)) {
+                //发送端的返回消息
+                int code = objectNode.get("code").asInt();
+                queue.offer(code);
+
             }
         }else if (EnMsgType.EN_MSG_CHAT.toString().equals(msgtype)){
             //接收端接收消息
