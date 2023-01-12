@@ -14,7 +14,7 @@ ENV JAVA_HOME=/usr/local/jdk/jdk1.8.0_211
 ENV CLASSPATH=$JAVA_HOME/bin
 ENV PATH=.:$JAVA_HOME/bin:$PATH
 
-FROM centos:7
+FROM ubuntu:18.04
 
 ADD jdk-8u311-linux-x64 .tar.gz /usr/local/jdk/
 
@@ -37,8 +37,7 @@ RUN rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
 RUN rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
 RUN yum install ffmpeg ffmpeg-devel -y
 
-sudo rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro
-sudo rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
+RUN yum install autoconf automake gcc gcc-c++ git libtool make nasm pkgconfig zlib-devel -y
 
 ADD ffmpeg-4.1.tar.xz /opt/soft/
 RUN mv /opt/soft/ffmpeg-6b6b9e5 /opt/soft/ffmpeg-4.1 \
@@ -83,7 +82,6 @@ WORKDIR /root
 
 
 FROM ubuntu:18.04
-LABEL MAINTAINER="eli.he@outlook.com>"
 
 COPY ./entrypoint.sh /usr/bin/
 COPY --from=0 /usr/local/taos /usr/local/taos
@@ -117,5 +115,76 @@ EXPOSE 6030 6031 6032 6033 6034 6035 6036 6037 6038 6039 6040 6041 6042
 CMD ["taosd"]
 VOLUME [ "/var/lib/taos", "/var/log/taos", "/corefile" ]
 ENTRYPOINT [ "/usr/bin/entrypoint.sh" ]
+
+FROM jdk8:base
+
+ADD TDengine-client-3.0.1.1-Linux-x64.tar.gz /usr/local/
+#ADD TDengine-server-3.0.1.1-Linux-x64.tar.gz /usr/local/
+
+RUN cd /usr/local/TDengine-client-3.0.1.1/ && ./install_client.sh
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  \
+    && echo "Asia/Shanghai" > /etc/timezone
+
+
+./configure --enable-shared --prefix=/usr/local/ffmpeg --enable-gpl --enable-libx264
+
+
+RUN curl -O http://mirrors.sau.edu.cn/repo/Centos-7.repo
+RUN yum clean all && yum makecache
+RUN yum -y update && yum -y install gcc build-essential && yum -y install make zlib-devel gcc-c++ libtool openssl openssl-devel
+WORKDIR /yasm
+ADD yasm-1.3.0.tar /yasm
+RUN cd /yasm/yasm-1.3.0; \
+./configure; \
+make; \
+make install;
+WORKDIR /ffmpeg
+ADD ffmpeg-4.1.tar.xz /ffmpeg
+RUN cd /ffmpeg/ffmpeg-4.1; \
+./configure --enable-shared --prefix=/usr/local/ffmpeg; \
+make; \
+make install; \
+echo "/usr/local/ffmpeg/lib" >> /etc/ld.so.conf; \
+ldconfig;
+ENV PATH /usr/local/ffmpeg/bin:$PATH
+
+
+FROM ubuntu-jdk:1.8
+
+RUN echo "http://mirrors.aliyun.com/alpine/v3.6/main" > /etc/apk/repositories \
+    && echo "http://mirrors.aliyun.com/alpine/v3.6/community" >> /etc/apk/repositories  \
+    && apk add --no-cache procps unzip curl bash tzdata  \
+    && apk add yasm && apk add ffmpeg \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime  \
+    && echo "Asia/Shanghai" > /etc/timezone
+
+FROM jdk1.8:latest
+
+RUN yum install -y epel-release rpm
+
+RUN sudo yum -y install make automake gcc gcc-c++ cc kernel-devel glibc-devel make
+
+ADD yasm-1.3.0.tar /yasm
+RUN cd /yasm/yasm-1.3.0; \
+./configure; \
+make; \
+make install;
+
+ADD ffmpeg-4.1.tar.xz /ffmpeg
+RUN cd /ffmpeg/ffmpeg-4.1; \
+./configure --enable-shared --prefix=/usr/local/ffmpeg; \
+make; \
+make install; \
+echo "/usr/local/ffmpeg/lib" >> /etc/ld.so.conf; \
+ldconfig;
+
+cd /usr/bin
+ln -s ffmpeg-git-20220910-amd64-static/ffmpeg ffmpeg
+ln -s ffmpeg-git-20220910-amd64-static/ffprobe ffprobe
+
+
+echo "/usr/local/ffmpeg/lib" >> /etc/ld.so.conf; \
+ldconfig;
 
 
